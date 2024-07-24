@@ -28,6 +28,37 @@
         exit;
     }
 
+    if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
+        $client->setAccessToken($_SESSION['access_token']);
+        $service = new Google_Service_Calendar($client);
+
+        // List events
+        $calendarId = 'primary';
+
+        try {
+            $events = $service->events->listEvents($calendarId);
+            echo '<h3>Upcoming Events</h3>';
+            foreach ($events->getItems() as $event) {
+                $startDateTime = $event->getStart()->getDateTime();
+                $endDateTime = $event->getEnd()->getDateTime();
+
+                if (!$startDateTime) {
+                    $startDateTime = $event->getStart()->getDate();
+                }
+                if (!$endDateTime) {
+                    $endDateTime = $event->getEnd()->getDate();
+                }
+
+                echo $event->getSummary() . ' - ' . date('Y-m-d h:i A', strtotime($startDateTime)) . ' to ' . date('Y-m-d h:i A', strtotime($endDateTime)) . '<br>';
+            }
+        } catch (Exception $e) {
+            echo 'Error: ' . $e->getMessage();
+        }
+
+    } else {
+        $authUrl = $client->createAuthUrl();
+        echo "<a href='$authUrl'>Connect to Google Calendar</a>";
+    }
     ?>
 </body>
 
