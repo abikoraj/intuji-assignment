@@ -55,6 +55,14 @@
             echo 'Error: ' . $e->getMessage();
         }
 
+        // Create event form
+        echo '<h3>Create Event</h3>';
+        echo '<form method="POST" action="create_event.php">
+                <input type="text" name="summary" placeholder="Event Summary" required>
+                <input type="datetime-local" name="start" required>
+                <input type="datetime-local" name="end" required>
+                <button type="submit">Create Event</button>
+              </form>';
     } else {
         $authUrl = $client->createAuthUrl();
         echo "<a href='$authUrl'>Connect to Google Calendar</a>";
