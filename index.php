@@ -12,7 +12,7 @@
     <nav class="bg-blue-600 p-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
             <div class="text-white text-lg font-bold">Google Calendar Integration</div>
-            <button type="button" class="text-white hover:text-red-700 border border-white-700 hover:bg-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Disconnect</button>
+            <a href="disconnect.php" type="button" class="text-white hover:text-red-700 border border-white-700 hover:bg-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Disconnect</a>
         </div>
     </nav>
 
