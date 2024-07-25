@@ -1,73 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Calendar API</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="container mx-auto p-8 space-y-8">
 
-    <?php
-    require_once 'vendor/autoload.php';
+        <?php
+        require_once 'vendor/autoload.php';
 
-    session_start();
+        session_start();
 
-    $client = new Google_Client();
-    $client->setAuthConfig('credentials.json');
-    $client->setRedirectUri('http://localhost:8000/index.php');
-    $client->addScope(Google_Service_Calendar::CALENDAR);
+        $client = new Google_Client();
+        $client->setAuthConfig('credentials.json');
+        $client->setRedirectUri('http://localhost:8000/index.php');
+        $client->addScope(Google_Service_Calendar::CALENDAR);
 
-    if (isset($_GET['code'])) {
-        $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-        if (isset($token['error'])) {
-            echo 'Error fetching access token: ' . $token['error'];
+        if (isset($_GET['code'])) {
+            $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+            if (isset($token['error'])) {
+                echo '<div class="text-red-500">Error fetching access token: ' . htmlspecialchars($token['error']) . '</div>';
+                exit;
+            }
+            $_SESSION['access_token'] = $token;
+            header('Location: ' . filter_var($_SERVER['PHP_SELF'], FILTER_SANITIZE_URL));
             exit;
         }
-        $_SESSION['access_token'] = $token;
-        header('Location: ' . filter_var($_SERVER['PHP_SELF'], FILTER_SANITIZE_URL));
-        exit;
-    }
 
-    if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
-        $client->setAccessToken($_SESSION['access_token']);
-        $service = new Google_Service_Calendar($client);
+        if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
+            $client->setAccessToken($_SESSION['access_token']);
+            $service = new Google_Service_Calendar($client);
 
-        // List events
-        $calendarId = 'primary';
+            // Create event container
+            echo '<div class="bg-white p-6 shadow-lg rounded-lg">';
+            echo '<h3 class="text-xl font-bold mb-4">Create Event</h3>';
+            echo '<form method="POST" action="create_event.php" class="flex flex-wrap space-x-4 items-center">
+                    <input type="text" name="summary" placeholder="Event Summary" required class="w-full md:w-1/4 p-2 border border-gray-300 rounded mb-2 md:mb-0">
+                    <input type="datetime-local" name="start" required class="w-full md:w-1/4 p-2 border border-gray-300 rounded mb-2 md:mb-0">
+                    <input type="datetime-local" name="end" required class="w-full md:w-1/4 p-2 border border-gray-300 rounded mb-2 md:mb-0">
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Create Event</button>
+                  </form>';
+            echo '</div>';
 
-        try {
-            $events = $service->events->listEvents($calendarId);
-            echo '<h3>Upcoming Events</h3>';
-            foreach ($events->getItems() as $event) {
-                $startDateTime = $event->getStart()->getDateTime();
-                $endDateTime = $event->getEnd()->getDateTime();
+            // List events container
+            echo '<div class="bg-white p-6 shadow-lg rounded-lg">';
+            echo '<h3 class="text-xl font-bold mb-4">Upcoming Events</h3>';
 
-                if (!$startDateTime) {
-                    $startDateTime = $event->getStart()->getDate();
+            // List events
+            $calendarId = 'primary';
+
+            try {
+                $events = $service->events->listEvents($calendarId);
+                echo '<div class="space-y-4">';
+                foreach ($events->getItems() as $event) {
+                    $startDateTime = $event->getStart()->getDateTime();
+                    $endDateTime = $event->getEnd()->getDateTime();
+
+                    if (!$startDateTime) {
+                        $startDateTime = $event->getStart()->getDate();
+                    }
+                    if (!$endDateTime) {
+                        $endDateTime = $event->getEnd()->getDate();
+                    }
+
+                    echo '<div class="p-4 bg-gray-50 border border-gray-300 rounded flex justify-between items-center">';
+                    echo '<div>';
+                    echo '<p class="font-semibold">' . htmlspecialchars($event->getSummary()) . '</p>';
+                    echo '<p class="text-gray-600">' . date('Y-m-d h:i A', strtotime($startDateTime)) . ' to ' . date('Y-m-d h:i A', strtotime($endDateTime)) . '</p>';
+                    echo '</div>';
+                    echo '<div>';
+                    echo '<button class="bg-red-500 text-white py-1 px-2 rounded">Delete</button>';
+                    echo '</div>';
+                    echo '</div>';
                 }
-                if (!$endDateTime) {
-                    $endDateTime = $event->getEnd()->getDate();
-                }
-
-                echo $event->getSummary() . ' - ' . date('Y-m-d h:i A', strtotime($startDateTime)) . ' to ' . date('Y-m-d h:i A', strtotime($endDateTime)) . '<br>';
+                echo '</div>';
+            } catch (Exception $e) {
+                echo '<div class="text-red-500">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
             }
-        } catch (Exception $e) {
-            echo 'Error: ' . $e->getMessage();
+            echo '</div>';
+        } else {
+            $authUrl = $client->createAuthUrl();
+            echo "<a href='" . htmlspecialchars($authUrl) . "' class='bg-blue-500 text-white py-2 px-4 rounded'>Connect to Google Calendar</a>";
         }
+        ?>
 
-        // Create event form
-        echo '<h3>Create Event</h3>';
-        echo '<form method="POST" action="create_event.php">
-                <input type="text" name="summary" placeholder="Event Summary" required>
-                <input type="datetime-local" name="start" required>
-                <input type="datetime-local" name="end" required>
-                <button type="submit">Create Event</button>
-              </form>';
-    } else {
-        $authUrl = $client->createAuthUrl();
-        echo "<a href='$authUrl'>Connect to Google Calendar</a>";
-    }
-    ?>
+    </div>
 </body>
 
 </html>
