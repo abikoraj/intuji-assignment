@@ -8,7 +8,14 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-blue-600 p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="text-white text-lg font-bold">Google Calendar Integration</div>
+            <button type="button" class="text-white hover:text-red-700 border border-white-700 hover:bg-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Disconnect</button>
+        </div>
+    </nav>
+
     <div class="container mx-auto p-8 space-y-8">
 
         <?php
@@ -43,7 +50,7 @@
                     <input type="text" name="summary" placeholder="Event Summary" required class="w-full md:w-1/4 p-2 border border-gray-300 rounded mb-2 md:mb-0">
                     <input type="datetime-local" name="start" required class="w-full md:w-1/4 p-2 border border-gray-300 rounded mb-2 md:mb-0">
                     <input type="datetime-local" name="end" required class="w-full md:w-1/4 p-2 border border-gray-300 rounded mb-2 md:mb-0">
-                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Create Event</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded">Create Event</button>
                   </form>';
             echo '</div>';
 
@@ -74,7 +81,7 @@
                     echo '<p class="text-gray-600">' . date('Y-m-d h:i A', strtotime($startDateTime)) . ' to ' . date('Y-m-d h:i A', strtotime($endDateTime)) . '</p>';
                     echo '</div>';
                     echo '<div>';
-                    echo '<button class="bg-red-500 text-white py-1 px-2 rounded">Delete</button>';
+                    echo '<button class="bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded">Delete</button>';
                     echo '</div>';
                     echo '</div>';
                 }
@@ -83,6 +90,7 @@
                 echo '<div class="text-red-500">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
             }
             echo '</div>';
+
         } else {
             $authUrl = $client->createAuthUrl();
             echo "<a href='" . htmlspecialchars($authUrl) . "' class='bg-blue-500 text-white py-2 px-4 rounded'>Connect to Google Calendar</a>";
