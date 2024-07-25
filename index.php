@@ -81,7 +81,10 @@
                     echo '<p class="text-gray-600">' . date('Y-m-d h:i A', strtotime($startDateTime)) . ' to ' . date('Y-m-d h:i A', strtotime($endDateTime)) . '</p>';
                     echo '</div>';
                     echo '<div>';
-                    echo '<button class="bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded">Delete</button>';
+                    echo '<form method="POST" action="delete_event.php" class="inline-block">';
+                    echo '<input type="hidden" name="event_id" value="' . htmlspecialchars($event->getId()) . '">';
+                    echo '<button type="submit" class="bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded">Delete</button>';
+                    echo '</form>';
                     echo '</div>';
                     echo '</div>';
                 }
@@ -90,7 +93,6 @@
                 echo '<div class="text-red-500">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
             }
             echo '</div>';
-
         } else {
             $authUrl = $client->createAuthUrl();
             echo "<a href='" . htmlspecialchars($authUrl) . "' class='bg-blue-500 text-white py-2 px-4 rounded'>Connect to Google Calendar</a>";
