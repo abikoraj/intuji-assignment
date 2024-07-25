@@ -55,7 +55,7 @@
             echo '</div>';
 
             // List events container
-            echo '<div class="bg-white p-6 shadow-lg rounded-lg">';
+            echo '<div class="rounded-lg">';
             echo '<h3 class="text-xl font-bold mb-4">Upcoming Events</h3>';
 
             // List events
@@ -75,7 +75,7 @@
                         $endDateTime = $event->getEnd()->getDate();
                     }
 
-                    echo '<div class="p-4 bg-gray-50 border border-gray-300 rounded flex justify-between items-center">';
+                    echo '<div class="p-4 shadow-md hover:shadow-lg bg-gray-50 border border-gray-300 rounded flex justify-between items-center">';
                     echo '<div>';
                     echo '<p class="font-semibold">' . htmlspecialchars($event->getSummary()) . '</p>';
                     echo '<p class="text-gray-600">' . date('Y-m-d h:i A', strtotime($startDateTime)) . ' to ' . date('Y-m-d h:i A', strtotime($endDateTime)) . '</p>';
